@@ -4,12 +4,30 @@ import numpy as np
 import socket
 import threading
 
+import numpy as np
 from ship import Player, Enemy
 from object import Fuel, Ammo, Object
 from misc import out_of_bounds, rot_center, out_of_bg
 
 
 class Game:
+    WIDTH = None
+    HEIGHT = None
+    crash = None
+    reload = None
+    fuel_sound = None
+    BG = None
+    bg = None
+    WIN = None
+    clock = None
+    big_font = None
+    main_font = None
+    small_font = None
+    very_small_font = None
+    FPS = None
+    rot_steer = None
+    forward_steer = None
+    engine_keys = None
 
     @staticmethod
     def init():
@@ -25,14 +43,15 @@ class Game:
         pygame.mixer.music.load(os.path.join("asset", "music.wav"))
         pygame.mixer.music.queue(os.path.join("asset", "music.wav"))
 
-        Game.BG = pygame.transform.scale(pygame.image.load(os.path.join("asset", "space.png")), (Game.WIDTH, Game.HEIGHT))
+        Game.BG = pygame.transform.scale(pygame.image.load(os.path.join("asset", "space.png")),
+                                         (Game.WIDTH, Game.HEIGHT))
 
         class Background(Object):
             def __init__(self, width, height):
                 super().__init__(0, 0)
 
             def get_img(self):
-                return BG
+                return Game.BG
 
         Game.bg = Background(Game.WIDTH, Game.HEIGHT)
 
@@ -50,8 +69,11 @@ class Game:
         Game.rot_steer = 0.2
         Game.forward_steer = 0.1
 
+        Game.engine_keys = {pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP,
+                       pygame.K_a, pygame.K_d, pygame.K_w}
+
     def __init__(self):
-        self.players = [Player(Game.WIDTH // 2, Game.HEIGHT // 2, 1, 0, 1, 0)]
+        self.players = [Player(Game.WIDTH // 2, Game.HEIGHT // 2, 1, 0, 1, -2)]
 
         self.fuels = [Fuel(0, 0).randomize(Game.WIDTH, Game.HEIGHT)]
         self.ammos = [Ammo(0, 0).randomize(Game.WIDTH, Game.HEIGHT)]
@@ -124,14 +146,36 @@ class Game:
             player.next_state()
             for laser in player.laser:
                 laser.next_state()
+        self.handle_collision()
 
-    def draw(self, i):
+    def draw(self, i=-1):
         Game.clock.tick(Game.FPS)
         Game.bg.draw(Game.WIN)
         self.draw_objects()
-        self.draw_gui(i)
+        if i >= 0:
+            self.draw_gui(i)
         pygame.display.update()
 
+    def handle_movement(self, i, keys):
+        player = self.players[i]
+        player.turn_off()
 
-BG = pygame.transform.scale(pygame.image.load(os.path.join("asset", "space.png")), (Game.WIDTH, Game.HEIGHT))
+        if player.oil_level != 0:
 
+            for key in Game.engine_keys:
+                if key in keys:
+                    player.turn_on()
+                    break
+
+            if pygame.K_LEFT in keys or pygame.K_a in keys:
+                player.speed_angle += Game.rot_steer
+            if pygame.K_RIGHT in keys or pygame.K_d in keys:
+                player.speed_angle -= Game.rot_steer
+
+            if pygame.K_UP in keys or pygame.K_w in keys:
+                angle = np.radians(player.angle + 90)
+                player.speed += np.array([np.cos(angle),
+                                          np.sin(-angle)]) * Game.forward_steer
+
+        if pygame.K_SPACE in keys:
+            player.shoot()

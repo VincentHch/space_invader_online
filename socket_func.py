@@ -36,9 +36,15 @@ def receive(conn):
 
 def handle_client(conn, addr, game):
     print("[NEW CONNECTION] " + str(addr) + " connected.")
-    index_player = threading.activeCount() - 1
+    index_player = threading.activeCount() - 2
     connected = True
     while connected:
+        keys = receive(conn)
+        if keys == DISCONNECT:
+            connected == False
+        game.handle_movement(index_player, keys)
         send(game, conn)
+
+        pygame.time.wait(1000//40)
 
     conn.close()

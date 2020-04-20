@@ -45,7 +45,7 @@ class Object:
         return None
 
     def get_mask(self):
-        return pygame.mask.from_surface(self.image)
+        return pygame.mask.from_surface(self.get_img())
 
 
 class Fuel(Object):

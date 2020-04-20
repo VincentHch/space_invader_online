@@ -7,16 +7,9 @@ import threading
 from ship import Player, Enemy
 from object import Fuel, Ammo
 from misc import out_of_bounds, rot_center, out_of_bg
-from socket_func import send, receive, handle_client, DISCONNECT
+from socket_func import send, receive, handle_client, DISCONNECT, PORT
 from game import Game
 
-# ** SOCKET CONSTANTS **
-
-HEADER = 5  # Length of the header msg containing the length of the next msg
-PORT = 5050
-SERVER = socket.gethostbyname(socket.gethostname())  # local IP adress, to change if we are not server
-ADDR = (SERVER, PORT)
-FORMAT = 'utf-8'
 
 # ** GAME CONSTANTS **
 """
@@ -267,23 +260,36 @@ def start():
         connected = True
         Game.init()
         while connected:
-            obj = receive(client)
-            if obj == DISCONNECT:
-                connected = False
+
+            keys_compact = set()
+
+            keys_pressed = pygame.key.get_pressed()
+            for key in Game.engine_keys:
+                if keys_pressed[key]:
+                    keys_compact.add(key)
+
+            send(keys_compact, client)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     connected = False
+
+            obj = receive(client)
+            if obj == DISCONNECT:
+                connected = False
 
             if type(obj) == Game:
                 pygame.event.get()
                 obj.draw(0)
                 pygame.display.flip()
-
+        send(DISCONNECT, client)
 
 def start_server(nb_players):
     print("Starting server...")
     Game.init()
     game = Game()
+    SERVER = socket.gethostbyname(socket.gethostname())  # local IP adress
+    ADDR = (SERVER, PORT)
     print("Server adress is : " + str(SERVER))
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(ADDR)  # open the server
@@ -296,11 +302,16 @@ def start_server(nb_players):
         compteur += 1
         thread = threading.Thread(target=handle_client, args=(conn, addr, game))
         thread.start()
-        print("[ACTIVE CONNECTIONS] " + str(threading.activeCount()))
+        print("[ACTIVE CONNECTIONS] " + str(threading.activeCount() - 1))
 
     print("starting game !")
-    while True:
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
         game.next_state()
+        game.draw()
 
 
 start()

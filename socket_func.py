@@ -39,7 +39,6 @@ def handle_client(conn, addr, game):
     index_player = threading.activeCount() - 1
     connected = True
     while connected:
-        print(game.players[0].pos)
         send(game, conn)
 
     conn.close()

@@ -10,42 +10,45 @@ from misc import out_of_bounds, rot_center, out_of_bg
 
 
 class Game:
-    WIDTH = 1200
-    HEIGHT = 800
-    pygame.init()
-    pygame.mixer.init()
 
-    crash = pygame.mixer.Sound(os.path.join("asset", "crash.wav"))
-    reload = pygame.mixer.Sound(os.path.join("asset", "reload.wav"))
-    fuel_sound = pygame.mixer.Sound(os.path.join("asset", "fill_fuel.wav"))
+    @staticmethod
+    def init():
+        WIDTH = 1200
+        HEIGHT = 800
+        pygame.init()
+        pygame.mixer.init()
 
-    pygame.mixer.music.load(os.path.join("asset", "music.wav"))
-    pygame.mixer.music.queue(os.path.join("asset", "music.wav"))
+        crash = pygame.mixer.Sound(os.path.join("asset", "crash.wav"))
+        reload = pygame.mixer.Sound(os.path.join("asset", "reload.wav"))
+        fuel_sound = pygame.mixer.Sound(os.path.join("asset", "fill_fuel.wav"))
 
-    BG = pygame.transform.scale(pygame.image.load(os.path.join("asset", "space.png")), (WIDTH, HEIGHT))
+        pygame.mixer.music.load(os.path.join("asset", "music.wav"))
+        pygame.mixer.music.queue(os.path.join("asset", "music.wav"))
 
-    class Background(Object):
-        def __init__(self, width, height):
-            super().__init__(0, 0)
+        BG = pygame.transform.scale(pygame.image.load(os.path.join("asset", "space.png")), (WIDTH, HEIGHT))
 
-        def get_img(self):
-            return BG
+        class Background(Object):
+            def __init__(self, width, height):
+                super().__init__(0, 0)
 
-    bg = Background(WIDTH, HEIGHT)
+            def get_img(self):
+                return BG
 
-    WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-    clock = pygame.time.Clock()
-    pygame.display.set_caption("Space Invaders")
+        bg = Background(WIDTH, HEIGHT)
 
-    big_font = pygame.font.SysFont('comicsans', 70)
-    main_font = pygame.font.SysFont('comicsans', 50)
-    small_font = pygame.font.SysFont('comicsans', 30)
-    very_small_font = pygame.font.SysFont('comicsans', 20)
+        WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+        clock = pygame.time.Clock()
+        pygame.display.set_caption("Space Invaders")
 
-    FPS = 60
+        big_font = pygame.font.SysFont('comicsans', 70)
+        main_font = pygame.font.SysFont('comicsans', 50)
+        small_font = pygame.font.SysFont('comicsans', 30)
+        very_small_font = pygame.font.SysFont('comicsans', 20)
 
-    rot_steer = 0.2
-    forward_steer = 0.1
+        FPS = 60
+
+        rot_steer = 0.2
+        forward_steer = 0.1
 
     def __init__(self):
         self.players = [Player(Game.WIDTH // 2, Game.HEIGHT // 2, 1, 0, 1, 0)]

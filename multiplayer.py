@@ -265,6 +265,7 @@ def start():
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
         connected = True
+        Game.init()
         while connected:
             obj = receive(client)
             if obj == DISCONNECT:
@@ -281,6 +282,7 @@ def start():
 
 def start_server(nb_players):
     print("Starting server...")
+    Game.init()
     game = Game()
     print("Server adress is : " + str(SERVER))
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -13,19 +13,19 @@ class Game:
 
     @staticmethod
     def init():
-        WIDTH = 1200
-        HEIGHT = 800
+        Game.WIDTH = 1200
+        Game.HEIGHT = 800
         pygame.init()
         pygame.mixer.init()
 
-        crash = pygame.mixer.Sound(os.path.join("asset", "crash.wav"))
-        reload = pygame.mixer.Sound(os.path.join("asset", "reload.wav"))
-        fuel_sound = pygame.mixer.Sound(os.path.join("asset", "fill_fuel.wav"))
+        Game.crash = pygame.mixer.Sound(os.path.join("asset", "crash.wav"))
+        Game.reload = pygame.mixer.Sound(os.path.join("asset", "reload.wav"))
+        Game.fuel_sound = pygame.mixer.Sound(os.path.join("asset", "fill_fuel.wav"))
 
         pygame.mixer.music.load(os.path.join("asset", "music.wav"))
         pygame.mixer.music.queue(os.path.join("asset", "music.wav"))
 
-        BG = pygame.transform.scale(pygame.image.load(os.path.join("asset", "space.png")), (WIDTH, HEIGHT))
+        Game.BG = pygame.transform.scale(pygame.image.load(os.path.join("asset", "space.png")), (Game.WIDTH, Game.HEIGHT))
 
         class Background(Object):
             def __init__(self, width, height):
@@ -34,21 +34,21 @@ class Game:
             def get_img(self):
                 return BG
 
-        bg = Background(WIDTH, HEIGHT)
+        Game.bg = Background(Game.WIDTH, Game.HEIGHT)
 
-        WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-        clock = pygame.time.Clock()
+        Game.WIN = pygame.display.set_mode((Game.WIDTH, Game.HEIGHT))
+        Game.clock = pygame.time.Clock()
         pygame.display.set_caption("Space Invaders")
 
-        big_font = pygame.font.SysFont('comicsans', 70)
-        main_font = pygame.font.SysFont('comicsans', 50)
-        small_font = pygame.font.SysFont('comicsans', 30)
-        very_small_font = pygame.font.SysFont('comicsans', 20)
+        Game.big_font = pygame.font.SysFont('comicsans', 70)
+        Game.main_font = pygame.font.SysFont('comicsans', 50)
+        Game.small_font = pygame.font.SysFont('comicsans', 30)
+        Game.very_small_font = pygame.font.SysFont('comicsans', 20)
 
-        FPS = 60
+        Game.FPS = 60
 
-        rot_steer = 0.2
-        forward_steer = 0.1
+        Game.rot_steer = 0.2
+        Game.forward_steer = 0.1
 
     def __init__(self):
         self.players = [Player(Game.WIDTH // 2, Game.HEIGHT // 2, 1, 0, 1, 0)]
